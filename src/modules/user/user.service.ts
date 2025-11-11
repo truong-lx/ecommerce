@@ -6,7 +6,8 @@ import { Model } from 'mongoose';
 @Injectable()
 export class UserService {
   constructor(@InjectModel(User.name) private userModal: Model<UserDocument>) {}
-  findUserByEmail(
+
+  findByEmail(
     email: string,
     select = {
       email: 1,
@@ -18,5 +19,9 @@ export class UserService {
     },
   ) {
     return this.userModal.findOne({ email }).select(select);
+  }
+
+  findById(id: string) {
+    return this.userModal.findById(id);
   }
 }

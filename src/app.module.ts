@@ -9,7 +9,6 @@ import { UserModule } from './modules/user/user.module';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
-      expandVariables: true,
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],

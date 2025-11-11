@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { ROLE } from 'src/constants/role.enum';
 
 @Schema({
   timestamps: true,
@@ -21,14 +22,11 @@ export class User {
   @Prop({ default: false })
   verify: boolean;
 
-  @Prop({ enum: ['ADMIN', 'SELLER'], default: 'SELLER' })
-  role: 'ADMIN' | 'SELLER';
+  @Prop({ enum: [ROLE.ADMIN, ROLE.SELLER], default: ROLE.SELLER })
+  role: ROLE.ADMIN | ROLE.SELLER;
 
   @Prop({ type: [String], default: [] })
   refreshTokens: string[];
-
-  @Prop({ type: [String], default: [] })
-  refreshTokensUsed: string[];
 }
 export type UserDocument = User & Document;
 export const UserSchema = SchemaFactory.createForClass(User);
