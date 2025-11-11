@@ -1,6 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { ROLE } from 'src/constants/role.enum';
+export class VariantOption {
+  name: string;
+  value: string;
+}
 
 @Schema({
   timestamps: true,
