@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { ChangePasswordDto } from './dto/change-password';
 
 @Controller('auth')
 export class AuthController {
@@ -21,18 +22,20 @@ export class AuthController {
 
   @UseGuards(AuthGuard('jwt'))
   @Delete('logout')
-  logout(@Request() request) {
-    const refreshToken = request.headers.get('x-refresh-token');
-    return refreshToken;
+  @HttpCode(204)
+  async logOut(@Request() request, @Body() body) {
+    await this.authService.logOut(request.user.userId, body.refreshToken);
   }
 
   @UseGuards(AuthGuard('jwt-refresh'))
   @Post('refresh-token')
-  onRefreshToken(@Request() request, @Body() body) {
-    console.log('body: ', body);
-    return this.authService.handleRefreshToken({
-      userId: request.user.userId,
-      refreshToken: body.refreshToken,
-    });
+  refreshToken(@Request() request, @Body() body) {
+    return this.authService.handleRefreshToken(request.user.userId, body.refreshToken);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('change-password')
+  changePassword(@Request() request, @Body() body: ChangePasswordDto) {
+    return this.authService.changePassword(request.user.userId, body);
   }
 }

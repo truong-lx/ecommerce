@@ -1,4 +1,9 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../user/schemas/user.schema';
 import { Model } from 'mongoose';
@@ -8,9 +13,9 @@ import { LoginDto } from './dto/login.dto';
 import bcrypt from 'bcrypt';
 import { SignUpDto } from './dto/signup.dto';
 import { ROLE } from 'src/constants/role.enum';
-import { getFields } from 'src/utils';
+import { convertToObjectId, getFields } from 'src/utils';
 import { ConfigService } from '@nestjs/config';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { ChangePasswordDto } from './dto/change-password';
 @Injectable()
 export class AuthService {
   constructor(
@@ -72,10 +77,17 @@ export class AuthService {
     };
   }
 
-  async handleRefreshToken({ userId, refreshToken }: RefreshTokenDto) {
-    console.log(userId, refreshToken);
+  logOut(userId: string, refreshToken: string) {
+    return this.userModel.findByIdAndUpdate(userId, {
+      $pull: {
+        refreshTokens: refreshToken,
+      },
+    });
+  }
+
+  async handleRefreshToken(userId: string, refreshToken: string) {
     const user = await this.userService.findById(userId).lean();
-    if (!user?.refreshTokens.includes(refreshToken))
+    if (!user?.refreshTokens?.includes(refreshToken))
       throw new UnauthorizedException('Invalid refresh token!');
     const accessToken = this.jwtService.sign(
       {
@@ -88,5 +100,20 @@ export class AuthService {
       },
     );
     return accessToken;
+  }
+
+  async changePassword(userId: string, { currentPassword, newPassword }: ChangePasswordDto) {
+    if (currentPassword === newPassword)
+      throw new BadRequestException('New password cannot be same as current password');
+    const findUser = await this.userService.findById(userId);
+    if (!findUser) throw new UnauthorizedException('User not found!');
+    const match = await bcrypt.compare(currentPassword, findUser.password);
+    if (!match) throw new UnauthorizedException('Current password is wrong!');
+    findUser.password = await bcrypt.hash(newPassword, 10);
+    findUser.refreshTokens = [];
+    await findUser.save();
+    return {
+      message: 'Success',
+    };
   }
 }
