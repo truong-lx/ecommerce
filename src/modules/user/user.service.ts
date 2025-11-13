@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from './schemas/user.schema';
-import { Model } from 'mongoose';
+import { User, UserDocument } from './user.schema';
+import { Model, UpdateQuery } from 'mongoose';
 
 @Injectable()
 export class UserService {
@@ -23,5 +23,15 @@ export class UserService {
 
   findById(id: string) {
     return this.userModal.findById(id);
+  }
+
+  create(user: Partial<User>) {
+    return this.userModal.create(user);
+  }
+
+  findByIdAndUpdate(userId: string, data: UpdateQuery<User>) {
+    return this.userModal.findByIdAndUpdate(userId, data, {
+      new: true,
+    });
   }
 }

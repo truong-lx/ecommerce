@@ -4,38 +4,40 @@ import { SignUpDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ChangePasswordDto } from './dto/change-password';
+import { GetUser } from 'src/libs/decorators/user.decorator';
+import { Public } from 'src/libs/decorators/public-route.decorator';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @Post('sign-up')
   @HttpCode(201)
   signUp(@Body() body: SignUpDto) {
     return this.authService.signUp(body);
   }
 
+  @Public()
   @Post('login')
   login(@Body() body: LoginDto) {
     return this.authService.login(body);
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @Delete('logout')
   @HttpCode(204)
-  async logOut(@Request() request, @Body() body) {
-    await this.authService.logOut(request.user.userId, body.refreshToken);
+  async logOut(@GetUser() user, @Body() body) {
+    await this.authService.logOut(user.userId, body.refreshToken);
   }
 
   @UseGuards(AuthGuard('jwt-refresh'))
   @Post('refresh-token')
-  refreshToken(@Request() request, @Body() body) {
-    return this.authService.handleRefreshToken(request.user.userId, body.refreshToken);
+  refreshToken(@GetUser() user, @Body() body) {
+    return this.authService.handleRefreshToken(user.userId, body.refreshToken);
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @Post('change-password')
-  changePassword(@Request() request, @Body() body: ChangePasswordDto) {
-    return this.authService.changePassword(request.user.userId, body);
+  changePassword(@GetUser() user, @Body() body: ChangePasswordDto) {
+    return this.authService.changePassword(user.userId, body);
   }
 }

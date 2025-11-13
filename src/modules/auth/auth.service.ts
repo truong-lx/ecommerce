@@ -4,22 +4,18 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from '../user/schemas/user.schema';
-import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { LoginDto } from './dto/login.dto';
 import bcrypt from 'bcrypt';
 import { SignUpDto } from './dto/signup.dto';
 import { ROLE } from 'src/constants/role.enum';
-import { convertToObjectId, getFields } from 'src/utils';
+import { getFields } from 'src/utils';
 import { ConfigService } from '@nestjs/config';
 import { ChangePasswordDto } from './dto/change-password';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
     private userService: UserService,
     private jwtService: JwtService,
     private configService: ConfigService,
@@ -30,13 +26,13 @@ export class AuthService {
       const findUser = await this.userService.findByEmail(email);
       if (findUser) throw new ConflictException('User already registered!');
       const hashPassword = await bcrypt.hash(password, 10);
-      const newUser = await this.userModel.create({
+      const newUser = await this.userService.create({
         name,
         email,
         password: hashPassword,
         role: ROLE.SELLER,
       });
-      const payload = { userId: newUser._id, email };
+      const payload = { userId: newUser._id, email, role: newUser.role };
       const accessToken = this.jwtService.sign(payload);
       const refreshToken = this.jwtService.sign(payload, {
         secret: this.configService.get('JWT_REFRESH_SECRET'),
@@ -63,7 +59,7 @@ export class AuthService {
     if (!findUser) throw new UnauthorizedException('Email not found!');
     const match = await bcrypt.compare(password, findUser.password);
     if (!match) throw new UnauthorizedException('Password is wrong!');
-    const payload = { userId: findUser._id, email };
+    const payload = { userId: findUser._id, email, role: findUser.role };
     const accessToken = this.jwtService.sign(payload);
     const refreshToken = this.jwtService.sign(payload, {
       secret: this.configService.get('JWT_REFRESH_SECRET'),
@@ -78,7 +74,7 @@ export class AuthService {
   }
 
   logOut(userId: string, refreshToken: string) {
-    return this.userModel.findByIdAndUpdate(userId, {
+    return this.userService.findByIdAndUpdate(userId, {
       $pull: {
         refreshTokens: refreshToken,
       },
