@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Product } from '../product/schemas/product.schema';
+import { Product } from '../product/product.schema';
 import slugify from 'slugify';
 export class CollectionImage {
   src: string;
