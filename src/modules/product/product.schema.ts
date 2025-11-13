@@ -48,9 +48,6 @@ export class Product {
   description;
 
   @Prop({ type: String })
-  code;
-
-  @Prop({ type: String })
   product_type;
 
   @Prop({ type: String, unique: true })
