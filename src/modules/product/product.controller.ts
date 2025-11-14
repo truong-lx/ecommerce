@@ -1,6 +1,7 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDTO } from './dto/create.dto';
+import { Pagination } from 'src/libs/decorators/pagination.decorator';
 
 @Controller('products')
 export class ProductController {
@@ -9,5 +10,10 @@ export class ProductController {
   @Post()
   create(@Body() createProductDto: CreateProductDTO) {
     return this.productService.create(createProductDto);
+  }
+
+  @Get()
+  getProducts(@Pagination() pagination) {
+    return this.productService.getProducts({ ...pagination, select: [] });
   }
 }

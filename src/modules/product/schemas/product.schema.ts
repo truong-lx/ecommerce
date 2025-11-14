@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Schema as MongooseSchema } from 'mongoose';
 import slugify from 'slugify';
-export class ProductOption {
-  name: string;
-  values: [string];
-}
+import { ProductOption, ProductOptionSchema } from './product-option.schema';
+import { Variant, VariantSchema } from './variant.schema';
+import { Review, ReviewSchema } from './review.schema';
+
 export class VariantOption {
   name: string;
   value: string;
@@ -12,28 +12,6 @@ export class VariantOption {
 export class ProductImage {
   src: string;
   alt: string;
-}
-
-export class ProductVariant {
-  title: string;
-  sku: string;
-  price: string;
-  compare_at_price: string;
-  option1?: string;
-  option2?: string;
-  option3?: string;
-  image: ProductImage;
-  created_at: Date;
-  updated_at: Date;
-}
-
-export class Review {
-  title: string;
-  content: string;
-  images: ProductImage[];
-  rating: number;
-  created_at: Date;
-  updated_at: Date;
 }
 
 @Schema({
@@ -60,21 +38,21 @@ export class Product {
   images: ProductImage[];
 
   @Prop({
-    type: [ProductOption],
+    type: [ProductOptionSchema],
     default: [],
   })
   options: ProductOption[];
 
-  @Prop({ type: [ProductVariant], default: [] })
-  variants: ProductVariant[];
+  @Prop({ type: [VariantSchema], default: [] })
+  variants: Variant[];
 
-  @Prop({ type: [Review], default: [] })
+  @Prop({ type: [ReviewSchema], default: [], _id: true })
   reviews: Review[];
 
   @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Collection' }] })
   collections;
 
-  @Prop({ type: Boolean, default: false })
+  @Prop({ type: Boolean, default: true })
   published;
 
   @Prop({ type: Boolean, default: false })

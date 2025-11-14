@@ -1,6 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsArray } from 'class-validator';
-import { ProductImage, ProductOption, ProductVariant, Review } from '../product.schema';
+import { ProductImage } from '../schemas/product.schema';
+import { ProductOption } from '../schemas/product-option.schema';
+import { Variant } from '../schemas/variant.schema';
+import { Review } from '../schemas/review.schema';
 
 export class CreateProductDTO {
   @ApiProperty({ required: true })
@@ -28,9 +31,8 @@ export class CreateProductDTO {
   @IsArray()
   options: ProductOption[];
 
-  @ApiProperty({ type: [ProductVariant] })
   @IsArray()
-  variants: ProductVariant[];
+  variants: Variant[];
 
   @ApiProperty({ type: [Review] })
   reviews: Review[];
