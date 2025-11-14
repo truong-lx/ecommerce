@@ -8,6 +8,8 @@ import { ProductModule } from './modules/product/product.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 import { CollectionModule } from './modules/collection/collection.module';
+import { OrderModule } from './modules/order/order.module';
+import { CartModule } from './modules/cart/cart.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -32,6 +34,8 @@ import { CollectionModule } from './modules/collection/collection.module';
     UserModule,
     ProductModule,
     CollectionModule,
+    OrderModule,
+    CartModule,
   ],
   controllers: [],
   providers: [
