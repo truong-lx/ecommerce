@@ -20,6 +20,7 @@ export class AuthController {
 
   @Public()
   @Post('login')
+  @HttpCode(200)
   login(@Body() body: LoginDto) {
     return this.authService.login(body);
   }
