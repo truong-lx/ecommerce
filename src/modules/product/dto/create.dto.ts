@@ -7,8 +7,7 @@ import { Review } from '../schemas/review.schema';
 
 export class CreateProductDTO {
   @ApiProperty({ required: true })
-  @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Title is required!' })
   title: string;
 
   @ApiProperty()

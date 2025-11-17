@@ -11,26 +11,14 @@ import { CollectionModule } from './modules/collection/collection.module';
 import { OrderModule } from './modules/order/order.module';
 import { CartModule } from './modules/cart/cart.module';
 import { SuccessResponseInterceptor } from './libs/interceptors/success-response';
+import { DatabaseModule } from './modules/database/database.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory(config: ConfigService) {
-        return {
-          uri: config.get<string>('MONGO_URI'),
-          maxPoolSize: 50,
-          authSource: 'admin',
-          appName: 'Ecommerce',
-          retryWrites: true,
-          w: 'majority',
-        };
-      },
-    }),
+    DatabaseModule.forRoot('mongodb'),
     AuthModule,
     UserModule,
     ProductModule,
