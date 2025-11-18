@@ -4,11 +4,21 @@ import { Product, ProductDocument } from './schemas/product.schema';
 import { Model } from 'mongoose';
 import { CreateProductDTO } from './dto/create.dto';
 import { PaginationParams } from 'src/libs/decorators/pagination.decorator';
+import { getSelectData } from 'src/utils';
 
 @Injectable()
 export class ProductService {
   constructor(@InjectModel(Product.name) private productModel: Model<ProductDocument>) {}
-
+  private findAll({ query, limit, page, select }) {
+    const skip = (page - 1) * limit;
+    return this.productModel
+      .find(query)
+      .sort({ updateAt: -1 })
+      .select(getSelectData(select))
+      .skip(skip)
+      .limit(limit)
+      .lean();
+  }
   private getProductOptions(product: ProductDocument) {
     if (
       +product?.options?.length &&
@@ -65,8 +75,33 @@ export class ProductService {
     const product = await this.productModel.create(createProductDto);
     return product;
   }
-  getProducts({ page, limit, select }: { page: number; limit: number; select: string[] }) {
-    const skip = (page - 1) * limit;
-    return this.productModel.find().skip(skip).limit(limit);
+
+  async getProducts({
+    pagination,
+    query,
+  }: {
+    pagination: PaginationParams;
+    query: any;
+  }): Promise<Product[]> {
+    const select = [
+      '_id',
+      'title',
+      'handle',
+      'description',
+      'product_type',
+      'tags',
+      'images',
+      'options',
+      'variants',
+      'reviews',
+      'collections',
+      'createdAt',
+    ];
+    const products = await this.findAll({
+      query,
+      select,
+      ...pagination,
+    });
+    return products;
   }
 }

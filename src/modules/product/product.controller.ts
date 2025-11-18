@@ -13,7 +13,7 @@ export class ProductController {
   }
 
   @Get()
-  getProducts(@Pagination() pagination) {
-    return this.productService.getProducts({ ...pagination, select: [] });
+  getProducts(@Pagination() pagination, @Query('published') published = true) {
+    return this.productService.getProducts({ pagination, query: { published } });
   }
 }

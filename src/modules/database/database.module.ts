@@ -1,7 +1,6 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { PrismaService } from './prisma.service';
 @Module({})
 export class DatabaseModule {
   static forRoot(databaseType: 'mongodb' | 'mysql'): DynamicModule {
@@ -28,13 +27,6 @@ export class DatabaseModule {
         exports: [DatabaseModule],
       };
     }
-    if (databaseType === 'mysql')
-      return {
-        module: DatabaseModule,
-        imports: [ConfigModule],
-        providers: [PrismaService],
-        exports: [DatabaseModule],
-      };
     throw new Error('Invalid database type');
   }
 }
