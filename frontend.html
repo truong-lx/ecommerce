@@ -14,10 +14,33 @@
   </head>
   <body>
     <main class="p-6">
-      <form action="">
-        <input type="file" name="fileUpload" />
-      </form>
+      <div class="flex items-center gap-x-3">
+        <input id="inputFile" type="file" name="fileUpload" class="border py-2 px-3 rounded" />
+        <button class="bg-red-500 px-4 py-2 rounded text-white">Upload file</button>
+      </div>
     </main>
-    <script></script>
+    <script>
+      window.onload = () => {
+        const inputFile = document.getElementById('inputFile');
+
+        inputFile.addEventListener('change', event => {
+          const file = event.target.files[0];
+          console.log('Selected file:', file);
+          const form = new FormData();
+          form.append('file', file);
+          fetch('http://localhost:3000/media/upload', {
+            method: 'POST',
+            body: form,
+          })
+            .then(response => response.json())
+            .then(data => {
+              console.log('Success:', data);
+            })
+            .catch(error => {
+              console.error('Error:', error);
+            });
+        });
+      };
+    </script>
   </body>
 </html>
