@@ -11,6 +11,7 @@ import { OrderModule } from './modules/order/order.module';
 import { CartModule } from './modules/cart/cart.module';
 import { SuccessResponseInterceptor } from './libs/interceptors/success-response';
 import { DatabaseModule } from './modules/database/database.module';
+import { MediaModule } from './modules/media/media.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -24,6 +25,7 @@ import { DatabaseModule } from './modules/database/database.module';
     CollectionModule,
     OrderModule,
     CartModule,
+    MediaModule,
   ],
   controllers: [],
   providers: [

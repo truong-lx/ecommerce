@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadGatewayException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product, ProductDocument } from './schemas/product.schema';
 import { Model } from 'mongoose';
@@ -19,7 +19,7 @@ export class ProductService {
       .limit(limit)
       .lean();
   }
-  private getProductOptions(product: ProductDocument) {
+  private getProductOptions(product: any) {
     if (
       +product?.options?.length &&
       product.options[0]?.name &&
@@ -72,8 +72,14 @@ export class ProductService {
   }
 
   async create(createProductDto: CreateProductDTO) {
-    const product = await this.productModel.create(createProductDto);
-    return product;
+    try {
+      createProductDto.options = this.getProductOptions(createProductDto);
+      const product = await this.productModel.create(createProductDto);
+      return product;
+    } catch (error) {
+      console.log('create product error: ', error);
+      throw new BadGatewayException();
+    }
   }
 
   async getProducts({
@@ -82,26 +88,26 @@ export class ProductService {
   }: {
     pagination: PaginationParams;
     query: any;
-  }): Promise<Product[]> {
-    const select = [
-      '_id',
-      'title',
-      'handle',
-      'description',
-      'product_type',
-      'tags',
-      'images',
-      'options',
-      'variants',
-      'reviews',
-      'collections',
-      'createdAt',
-    ];
-    const products = await this.findAll({
-      query,
-      select,
-      ...pagination,
-    });
-    return products;
+  }): Promise<any> {
+    try {
+      const skip = (pagination.page - 1) * pagination.limit;
+      const products = await this.productModel
+        .find(query)
+        .sort({ updateAt: -1 })
+        .skip(skip)
+        .limit(pagination.limit)
+        .lean();
+      const total = await this.productModel.countDocuments(query).exec();
+      return {
+        products,
+        pagination: {
+          ...pagination,
+          total,
+        },
+      };
+    } catch (error) {
+      console.log('getProducts error: ', error);
+      throw new BadGatewayException();
+    }
   }
 }

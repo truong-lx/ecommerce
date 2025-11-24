@@ -14,6 +14,6 @@ export class ProductController {
 
   @Get()
   getProducts(@Pagination() pagination, @Query('published') published = true) {
-    return this.productService.getProducts({ pagination, query: { published } });
+    return this.productService.getProducts({ pagination, query: { published, deleted: false } });
   }
 }
