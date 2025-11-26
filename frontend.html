@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <style type="text/tailwindcss">
       html,
       body {
@@ -23,22 +24,24 @@
       window.onload = () => {
         const inputFile = document.getElementById('inputFile');
 
-        inputFile.addEventListener('change', event => {
+        inputFile.addEventListener('change', async event => {
           const file = event.target.files[0];
-          console.log('Selected file:', file);
           const form = new FormData();
           form.append('file', file);
-          fetch('http://localhost:3000/media/upload', {
-            method: 'POST',
-            body: form,
-          })
-            .then(response => response.json())
-            .then(data => {
-              console.log('Success:', data);
-            })
-            .catch(error => {
-              console.error('Error:', error);
-            });
+          // await fetch('http://localhost:4000/api/media/upload', {
+          //   method: 'POST',
+          //   body: form,
+          //   headers: {
+          //     'Content-Type': 'multipart/form-data',
+          //     Authorization:
+          //       'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTEyZjY1YTFkYTIzZTM1NTEyYzY1OTYiLCJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc2NDE0NTg4MiwiZXhwIjoxNzY0MjMyMjgyfQ._ynn2a7Wrfkahd279cf5AgE2WKxhDAUsSWVSt64V2Gw',
+          //     'Access-Control-Allow-Origin': '*',
+          //   },
+          // });
+          await axios.post('http://localhost:4000/api/auth/login', {
+            email: 'admin@gmail.com',
+            password: '123456',
+          });
         });
       };
     </script>
