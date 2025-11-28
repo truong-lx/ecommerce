@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -23,6 +24,7 @@ async function bootstrap() {
   SwaggerModule.setup('api/docs', app, documentFactory, {
     jsonDocumentUrl: 'api-json',
   });
+  app.useStaticAssets(join(__dirname, '../uploads'), { prefix: '/uploads' });
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
