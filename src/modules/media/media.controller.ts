@@ -6,7 +6,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { MediaService } from './media.service';
-import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { storage } from './storage';
 import path from 'path';
 
@@ -41,7 +41,7 @@ export class MediaController {
       },
     ),
   )
-  upload(@UploadedFile() files: { file?: Express.Multer.File; files: Express.Multer.File[] }) {
-    return file.path;
+  upload(@UploadedFile() file: { file?: Express.Multer.File; files?: Express.Multer.File[] }) {
+    return file?.file?.path;
   }
 }
